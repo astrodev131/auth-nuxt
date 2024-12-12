@@ -103,13 +103,14 @@
         Continue with Google
       </button>
 
-      <form class="w-full md:w-2/4">
+      <div class="w-full md:w-2/4">
         <div class="mb-4">
           <label for="email" class="block text-sm font-medium text-gray-700"
             >Email*</label
           >
           <input
             type="email"
+            v-model="formData.email"
             id="email"
             class="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             placeholder="Enter your email"
@@ -121,6 +122,7 @@
           >
           <input
             type="password"
+            v-model="formData.password"
             id="password"
             class="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             placeholder="Create a password"
@@ -128,11 +130,12 @@
         </div>
         <button
           type="submit"
+          @click="login"
           class="w-full px-4 py-2 text-white bg-black rounded-md hover:bg-gray-800"
         >
           Sign in
         </button>
-      </form>
+      </div>
 
       <p class="text-sm text-gray-500 mt-4">
         Already have an account?
@@ -143,3 +146,33 @@
     </div>
   </div>
 </template>
+<script setup lang="ts">
+import { ref } from "vue";
+import { BACKENDURL } from "../utils/backendUrl";
+import axios from "axios";
+
+// Define reactive form data
+const formData = ref({
+  email: "",
+  password: "",
+});
+
+// Define a reactive message
+const message = ref<string>("");
+const invalidMsg = ref<any>("");
+const login = async (): Promise<void> => {
+  try {
+    const response = await axios.post(
+      "http://localhost:5000/auth/login",
+      formData.value
+    );
+
+    message.value = response.data.message;
+    console.log(message.value);
+  } catch (error: any) {
+    message.value = error?.response; // Set the error message
+    invalidMsg.value = error.response?.data?.message;
+    console.log(error.response.data, "sdfsdfsdf");
+  }
+};
+</script>

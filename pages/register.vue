@@ -102,7 +102,7 @@
         Continue with Google
       </button>
 
-      <form class="w-full md:w-2/4">
+      <div class="w-full md:w-2/4">
         <div class="mb-4">
           <label for="name" class="block text-sm font-medium text-gray-700"
             >Name*</label
@@ -110,18 +110,18 @@
           <input
             type="text"
             id="name"
-            v-model="name"
+            v-model="formData.name"
             class="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             placeholder="Enter your name"
           />
         </div>
         <div class="mb-4">
           <label for="email" class="block text-sm font-medium text-gray-700"
-            >Email*</label
+            >Email*{{ message }}{{ invalidMsg }}</label
           >
           <input
             type="email"
-            v-model="email"
+            v-model="formData.email"
             id="email"
             class="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             placeholder="Enter your email"
@@ -133,7 +133,7 @@
           >
           <input
             type="password"
-            v-model="password"
+            v-model="formData.password"
             id="password"
             class="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             placeholder="Create a password"
@@ -150,12 +150,13 @@
           </label>
         </div>
         <button
+          @click="register"
           type="submit"
           class="w-full px-4 py-2 text-white bg-black rounded-md hover:bg-gray-800"
         >
           Sign up
         </button>
-      </form>
+      </div>
 
       <p class="text-sm text-gray-500 mt-4">
         Already have an account?
@@ -165,19 +166,31 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-const email = ref("");
-const name = ref("");
-const password = ref("");
-const data = ref(null);
+import { ref } from "vue";
+import { BACKENDURL } from "../utils/backendUrl";
+import axios from "axios";
 
-const register = async () => {
-  const { $axios } = useNuxtApp() as any; // Get Axios instance
+// Define reactive form data
+const formData = ref({
+  name: "",
+  email: "",
+  password: "",
+});
+
+// Define a reactive message
+const message = ref<string>("");
+const invalidMsg = ref<any>("");
+const register = async (): Promise<void> => {
   try {
-    data.value = await $axios.$get("/endpoint"); // Replace '/endpoint' with your API route
-  } catch (error) {
-    console.error("Error fetching data:", error);
+    const response = await axios.post(
+      "http://localhost:5000/auth/register",
+      formData.value
+    );
+    message.value = response.data.message; // Set the success message
+  } catch (error: any) {
+    message.value = error.response?.data.message; // Set the error message
+    invalidMsg.value = error.response?.data?.errors[0].msg;
+    console.log(invalidMsg.value, "sdfsdfsdf");
   }
 };
-onMounted(register);
 </script>
