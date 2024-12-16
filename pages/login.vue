@@ -115,6 +115,15 @@
             class="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             placeholder="Enter your email"
           />
+          <p
+            v-if="
+              invalidMsg[0]?.msg === 'Please provide a valid email' ||
+              invalidMsg[1]?.msg === 'Please provide a valid email'
+            "
+            class="text-red-500 text-xs mt-1"
+          >
+            Please provide a valid email
+          </p>
         </div>
         <div class="mb-6">
           <label for="password" class="block text-sm font-medium text-gray-700"
@@ -127,11 +136,20 @@
             class="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             placeholder="Create a password"
           />
+          <p
+            v-if="
+              invalidMsg[0]?.msg === 'Password is required' ||
+              invalidMsg[1]?.msg === 'Password is required'
+            "
+            class="text-red-500 text-xs mt-1"
+          >
+            Password is required
+          </p>
         </div>
         <button
           type="submit"
           @click="login"
-          class="w-full px-4 py-2 text-white bg-black rounded-md hover:bg-gray-800"
+          class="w-full px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600"
         >
           Sign in
         </button>
@@ -158,7 +176,6 @@ const formData = ref({
 });
 
 // Define a reactive message
-const message = ref<string>("");
 const invalidMsg = ref<any>("");
 const login = async (): Promise<void> => {
   try {
@@ -166,13 +183,12 @@ const login = async (): Promise<void> => {
       "http://localhost:5000/auth/login",
       formData.value
     );
-
-    message.value = response.data.message;
-    console.log(message.value);
+    if (response?.data?.message) alert(response?.data?.message);
   } catch (error: any) {
-    message.value = error?.response; // Set the error message
-    invalidMsg.value = error.response?.data?.message;
-    console.log(error.response.data, "sdfsdfsdf");
+    if (error.response?.data?.message) alert(error.response?.data?.message);
+    invalidMsg.value = error.response?.data?.errors;
+    console.log(invalidMsg?.value[0]?.msg, "sdfsdfsdf"); // alert(message.value.message); }
+    // alert(message.value.message);
   }
 };
 </script>

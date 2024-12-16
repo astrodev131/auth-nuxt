@@ -114,10 +114,16 @@
             class="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             placeholder="Enter your name"
           />
+          <p
+            v-if="invalidMsg[0]?.msg === 'Name is required'"
+            class="text-red-500 text-xs mt-1"
+          >
+            {{ invalidMsg[0].msg }}
+          </p>
         </div>
         <div class="mb-4">
           <label for="email" class="block text-sm font-medium text-gray-700"
-            >Email*{{ message }}{{ invalidMsg }}</label
+            >Email*{{ message }}</label
           >
           <input
             type="email"
@@ -126,6 +132,16 @@
             class="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             placeholder="Enter your email"
           />
+          <p
+            v-if="
+              invalidMsg[0]?.msg === 'Please provide a valid email' ||
+              invalidMsg[1]?.msg === 'Please provide a valid email' ||
+              invalidMsg[2]?.msg === 'Please provide a valid email'
+            "
+            class="text-red-500 text-xs mt-1"
+          >
+            Please provide a valid email
+          </p>
         </div>
         <div class="mb-6">
           <label for="password" class="block text-sm font-medium text-gray-700"
@@ -138,11 +154,26 @@
             class="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             placeholder="Create a password"
           />
+          <p
+            v-if="
+              invalidMsg[0]?.msg ===
+                'Password must be at least 6 characters long' ||
+              invalidMsg[1]?.msg ===
+                'Password must be at least 6 characters long' ||
+              invalidMsg[2]?.msg ===
+                'Password must be at least 6 characters long'
+            "
+            class="text-red-500 text-xs mt-1"
+          >
+            Password must be at least 6 characters long
+          </p>
         </div>
         <div class="flex items-center mb-4">
           <input
             type="checkbox"
             id="terms"
+            v-model="inbox"
+            @change="handleChange"
             class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
           />
           <label for="terms" class="ml-2 block text-sm text-gray-700">
@@ -151,8 +182,13 @@
         </div>
         <button
           @click="register"
+          :disabled="!inbox"
           type="submit"
-          class="w-full px-4 py-2 text-white bg-black rounded-md hover:bg-gray-800"
+          class="w-full px-4 py-2 text-white rounded-md hover:bg-gray-800"
+          :class="{
+            'bg-gray-400 cursor-not-allowed opacity-50': !inbox,
+            'bg-green-500 hover:bg-green-600': inbox,
+          }"
         >
           Sign up
         </button>
@@ -167,10 +203,10 @@
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
-import { BACKENDURL } from "../utils/backendUrl";
 import axios from "axios";
 
 // Define reactive form data
+
 const formData = ref({
   name: "",
   email: "",
@@ -180,17 +216,25 @@ const formData = ref({
 // Define a reactive message
 const message = ref<string>("");
 const invalidMsg = ref<any>("");
+const inbox = ref<any>(false);
 const register = async (): Promise<void> => {
   try {
     const response = await axios.post(
       "http://localhost:5000/auth/register",
       formData.value
     );
-    message.value = response.data.message; // Set the success message
+    if (response?.data?.message) alert(response?.data?.message);
+    // Set the success message
   } catch (error: any) {
-    message.value = error.response?.data.message; // Set the error message
-    invalidMsg.value = error.response?.data?.errors[0].msg;
-    console.log(invalidMsg.value, "sdfsdfsdf");
+    if (error.response.data.message) alert(error.response.data.message);
+    invalidMsg.value = error.response?.data?.errors;
+    console.log(invalidMsg?.value[0]?.msg, "sdfsdfsdf");
+    // alert(message.value.message);
   }
 };
+
+const handleChange = () => {
+  console.log(inbox.value); // Logs `true` when checked, `false` when unchecked
+};
+console.log(inbox);
 </script>
