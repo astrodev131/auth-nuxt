@@ -115,15 +115,15 @@
             placeholder="Enter your name"
           />
           <p
-            v-if="invalidMsg[0]?.msg === 'Name is required'"
+            v-if="useAuthStore().validation?.name"
             class="text-red-500 text-xs mt-1"
           >
-            {{ invalidMsg[0].msg }}
+            Name is required
           </p>
         </div>
         <div class="mb-4">
           <label for="email" class="block text-sm font-medium text-gray-700"
-            >Email*{{ message }}</label
+            >Email*</label
           >
           <input
             type="email"
@@ -133,11 +133,7 @@
             placeholder="Enter your email"
           />
           <p
-            v-if="
-              invalidMsg[0]?.msg === 'Please provide a valid email' ||
-              invalidMsg[1]?.msg === 'Please provide a valid email' ||
-              invalidMsg[2]?.msg === 'Please provide a valid email'
-            "
+            v-if="useAuthStore().validation?.email"
             class="text-red-500 text-xs mt-1"
           >
             Please provide a valid email
@@ -155,14 +151,7 @@
             placeholder="Create a password"
           />
           <p
-            v-if="
-              invalidMsg[0]?.msg ===
-                'Password must be at least 6 characters long' ||
-              invalidMsg[1]?.msg ===
-                'Password must be at least 6 characters long' ||
-              invalidMsg[2]?.msg ===
-                'Password must be at least 6 characters long'
-            "
+            v-if="useAuthStore().validation?.password"
             class="text-red-500 text-xs mt-1"
           >
             Password must be at least 6 characters long
@@ -202,8 +191,13 @@
   </div>
 </template>
 <script setup lang="ts">
+import { storeToRefs } from "pinia"; // import storeToRefs helper hook from pinia
+import { useAuthStore } from "../stores/counter"; // import the auth store we just created
 import { ref } from "vue";
 import axios from "axios";
+const { registerUser } = useAuthStore(); // use loginUser action from  auth store
+const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive wih storeToRefs
+const router = useRouter();
 
 // Define reactive form data
 
@@ -214,27 +208,20 @@ const formData = ref({
 });
 
 // Define a reactive message
-const message = ref<string>("");
 const invalidMsg = ref<any>("");
 const inbox = ref<any>(false);
-const register = async (): Promise<void> => {
-  try {
-    const response = await axios.post(
-      "http://localhost:5000/auth/register",
-      formData.value
-    );
-    if (response?.data?.message) alert(response?.data?.message);
-    // Set the success message
-  } catch (error: any) {
-    if (error.response.data.message) alert(error.response.data.message);
-    invalidMsg.value = error.response?.data?.errors;
-    console.log(invalidMsg?.value[0]?.msg, "sdfsdfsdf");
-    // alert(message.value.message);
+
+const register = async () => {
+  await registerUser(formData.value); // Wait for authentication
+  if (authenticated.value) {
+    router.push("/"); // Redirect if authenticated
+  } else {
+    console.error("Authentication failed");
   }
 };
-
 const handleChange = () => {
   console.log(inbox.value); // Logs `true` when checked, `false` when unchecked
 };
 console.log(inbox);
 </script>
+<script lang="ts" setup></script>

@@ -168,12 +168,12 @@ const formData = ref({
 
 console.log(useAuthStore().validation?.email, "11111111111");
 
-const { authenticateUser } = useAuthStore(); // use authenticateUser action from  auth store
+const { loginUser } = useAuthStore(); // use loginUser action from  auth store
 const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive wih storeToRefs
 const router = useRouter();
 
 const login = async () => {
-  await authenticateUser(formData.value); // Wait for authentication
+  await loginUser(formData.value); // Wait for authentication
   if (authenticated.value) {
     router.push("/"); // Redirect if authenticated
   } else {

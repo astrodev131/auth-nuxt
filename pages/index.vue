@@ -35,7 +35,7 @@ import { useAuthStore } from "../stores/counter"; // import the auth store we ju
 
 console.log(useAuthStore().validation?.email, "11111111111");
 
-const { authenticateUser } = useAuthStore(); // use authenticateUser action from  auth store
+const { loginUser } = useAuthStore(); // use loginUser action from  auth store
 const { logUserOut } = useAuthStore();
 
 const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive with storeToRefs
@@ -47,7 +47,7 @@ const user = ref({
 const router = useRouter();
 
 const login = async () => {
-  await authenticateUser(user.value); // Wait for authentication
+  await loginUser(user.value); // Wait for authentication
   if (authenticated.value) {
     // Use `.value` because it's a reactive reference
     router.push("/"); // Redirect if authenticated
