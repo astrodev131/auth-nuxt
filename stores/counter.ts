@@ -5,15 +5,21 @@ interface UserPayloadInterface {
   password: string;
 }
 
+interface UserData {
+  name: string;
+  email: string;
+}
+
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     authenticated: false,
     loading: false,
+    userData: null as UserData | null,
   }),
   actions: {
     async authenticateUser({ email, password }: UserPayloadInterface) {
       // useFetch from nuxt 3
-      const { data, pending }: any = await useFetch(
+      const { data, pending, error }: any = await useFetch(
         "http://localhost:5000/auth/login",
         {
           method: "post",
@@ -25,12 +31,18 @@ export const useAuthStore = defineStore("auth", {
         }
       );
       this.loading = pending;
-      console.log(this.authenticated, "!!!!!!!!!!");
+      console.log(data.value.user, "!!!!!!!!!!");
+      if (error.value) throw new Error(error.value.message);
+      this.loading = pending;
 
       if (data.value) {
-        const token = useCookie("token"); // useCookie new hook in nuxt 3
-        token.value = data?.value?.token; // set token to cookie
-        this.authenticated = true; // set authenticated  state value to true
+        const token = useCookie("token");
+        token.value = data.value.token;
+        this.authenticated = true;
+        this.userData = {
+          name: data.value.user.name,
+          email: data.value.user.email,
+        };
       }
     },
     logUserOut() {
