@@ -26,7 +26,7 @@ export const useAuthStore = defineStore("auth", {
   }),
   actions: {
     async authenticateUser({ email, password }: UserPayloadInterface) {
-      this.loading = true; // Set loading to true while making the request
+      this.loading = true; // Set loading to true while making the requestf
 
       try {
         const response = await axios.post(
