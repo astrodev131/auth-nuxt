@@ -39,7 +39,7 @@ const { logUserOut } = useAuthStore();
 const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive with storeToRefs
 
 const user = ref({
-  email: "aaa@outlook.com",
+  email: "aaa@outglook.com",
   password: "aaaaaa",
 });
 const router = useRouter();
