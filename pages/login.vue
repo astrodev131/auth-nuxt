@@ -169,7 +169,7 @@ const formData = ref({
 console.log(useAuthStore().validation?.email, "11111111111");
 
 const { authenticateUser } = useAuthStore(); // use authenticateUser action from  auth store
-const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive with storeToRefs
+const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive wih storeToRefs
 const router = useRouter();
 
 const login = async () => {
