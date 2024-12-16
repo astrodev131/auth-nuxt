@@ -31,7 +31,6 @@ export const useAuthStore = defineStore("auth", {
         }
       );
       this.loading = pending;
-      console.log(data.value.user, "!!!!!!!!!!");
       if (error.value) throw new Error(error.value.message);
       this.loading = pending;
 
@@ -49,7 +48,6 @@ export const useAuthStore = defineStore("auth", {
       const token = useCookie("token"); // useCookie new hook in nuxt 3
       this.authenticated = false; // set authenticated  state value to false
       token.value = null; // clear the token cookie
-      console.log(this.authenticated, token.value, "sdfsdfsdfsdf");
     },
   },
 });

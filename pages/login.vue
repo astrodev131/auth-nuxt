@@ -166,7 +166,6 @@
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
-import { BACKENDURL } from "../utils/backendUrl";
 import axios from "axios";
 
 // Define reactive form data
