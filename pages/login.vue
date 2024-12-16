@@ -116,10 +116,7 @@
             placeholder="Enter your email"
           />
           <p
-            v-if="
-              invalidMsg[0]?.msg === 'Please provide a valid email' ||
-              invalidMsg[1]?.msg === 'Please provide a valid email'
-            "
+            v-if="useAuthStore().validation?.email"
             class="text-red-500 text-xs mt-1"
           >
             Please provide a valid email
@@ -137,10 +134,7 @@
             placeholder="Create a password"
           />
           <p
-            v-if="
-              invalidMsg[0]?.msg === 'Password is required' ||
-              invalidMsg[1]?.msg === 'Password is required'
-            "
+            v-if="useAuthStore().validation?.password"
             class="text-red-500 text-xs mt-1"
           >
             Password is required
@@ -164,30 +158,26 @@
     </div>
   </div>
 </template>
-<script setup lang="ts">
-import { ref } from "vue";
-import axios from "axios";
-
-// Define reactive form data
+<script lang="ts" setup>
+import { storeToRefs } from "pinia"; // import storeToRefs helper hook from pinia
+import { useAuthStore } from "../stores/counter"; // import the auth store we just created
 const formData = ref({
   email: "",
   password: "",
 });
 
-// Define a reactive message
-const invalidMsg = ref<any>("");
-const login = async (): Promise<void> => {
-  try {
-    const response = await axios.post(
-      "http://localhost:5000/auth/login",
-      formData.value
-    );
-    if (response?.data?.message) alert(response?.data?.message);
-  } catch (error: any) {
-    if (error.response?.data?.message) alert(error.response?.data?.message);
-    invalidMsg.value = error.response?.data?.errors;
-    console.log(invalidMsg?.value[0]?.msg, "sdfsdfsdf"); // alert(message.value.message); }
-    // alert(message.value.message);
+console.log(useAuthStore().validation?.email, "11111111111");
+
+const { authenticateUser } = useAuthStore(); // use authenticateUser action from  auth store
+const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive with storeToRefs
+const router = useRouter();
+
+const login = async () => {
+  await authenticateUser(formData.value); // Wait for authentication
+  if (authenticated.value) {
+    router.push("/"); // Redirect if authenticated
+  } else {
+    console.error("Authentication failed");
   }
 };
 </script>

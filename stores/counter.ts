@@ -12,17 +12,17 @@ interface UserData {
   name: string;
   email: string;
 }
-interface validation {}
-// Define reactive form data
-// Define a reactive message
-const invalidMsg = ref<string>("");
 
+interface Validation {
+  email: string;
+  password: string;
+}
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     authenticated: false,
     loading: false,
     userData: null as UserData | null,
-    validation: null as UserData | null,
+    validation: null as Validation | null,
   }),
   actions: {
     async authenticateUser({ email, password }: UserPayloadInterface) {
@@ -38,19 +38,21 @@ export const useAuthStore = defineStore("auth", {
           const token = useCookie("token");
           token.value = response.data.token;
           this.authenticated = true;
-          this.userData = {
-            name: response.data.user.name,
-            email: response.data.user.email,
-          };
           alert(response?.data?.message); // Show success message
         }
       } catch (error: any) {
-        if (error.response?.data?.message) {
-          alert(error.response?.data?.message); // Show error message
-        }
-        invalidMsg.value =
-          error.response?.data?.errors?.[0]?.msg || "An error occurred"; // Safely handle potential errors
-        console.log(invalidMsg.value); // Log the error message
+        console.log(error.response?.data?.errors[0]?.path);
+        this.validation = {
+          email:
+            error.response?.data?.errors[0]?.path === "email"
+              ? "Please provide a valid email"
+              : "",
+          password:
+            error.response?.data?.errors[0]?.path === "password" ||
+            error.response?.data?.errors[1]?.path === "password"
+              ? "Password is required"
+              : "",
+        };
       } finally {
         this.loading = false; // Set loading to false after the request is complete
       }
@@ -59,7 +61,7 @@ export const useAuthStore = defineStore("auth", {
     logUserOut() {
       const token = useCookie("token"); // useCookie hook in Nuxt 3
       this.authenticated = false; // Set authenticated state to false
-      token.value = null; // Clear the token cookie
+      token.value = null; // Clear the token cookie 
     },
   },
 });

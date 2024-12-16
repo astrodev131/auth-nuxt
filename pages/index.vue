@@ -33,13 +33,15 @@
 import { storeToRefs } from "pinia"; // import storeToRefs helper hook from pinia
 import { useAuthStore } from "../stores/counter"; // import the auth store we just created
 
+console.log(useAuthStore().validation?.email, "11111111111");
+
 const { authenticateUser } = useAuthStore(); // use authenticateUser action from  auth store
 const { logUserOut } = useAuthStore();
 
 const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive with storeToRefs
 
 const user = ref({
-  email: "aaa@outglook.com",
+  email: "aaa@outlook.com",
   password: "aaaaaa",
 });
 const router = useRouter();
